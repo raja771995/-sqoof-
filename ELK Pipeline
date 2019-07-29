@@ -1,0 +1,108 @@
+Build a pipeline to transfer data from a flat file (log data) to Elasticsearch. The required components of the pipeline are: Logstash (or Beats) > Kafka > Elasticsearch > Kibana.
+
+You can tail any log file of your choice (like syslog, http log, or any sample log file downloaded from the internet). You will use Logstash (or Beats) to send the records/data present in the log file to Elasticsearch either directly or through Kafka (optional). Next install Kibana and view/analyse this data in Kibana page.
+
+You should be able to install all the components necessary for the stack on your laptop and proceed with building the pipeline.
+
+Push all your codes to GitHub and submit the GitHub URL in your job application.
+
+
+sudo su
+vim /etc/elasticsearch/elasticsearch.yml
+
+network.host: "localhost"
+http.port:9200
+cluster.initial_master_nodes: ["<InstancePrivateIP"]
+
+sudo service elasticsearch start
+
+
+{
+  "name" : "ip-172-31-49-60",
+  "cluster_name" : "elasticsearch",
+  "cluster_uuid" : "yP0uMKA6QmCsXQon-rxawQ",
+  "version" : {
+    "number" : "7.0.0",
+    "build_flavor" : "default",
+    "build_type" : "deb",
+    "build_hash" : "b7e28a7",
+    "build_date" : "2019-04-05T22:55:32.697037Z",
+    "build_snapshot" : false,
+    "lucene_version" : "8.0.0",
+    "minimum_wire_compatibility_version" : "6.7.0",
+    "minimum_index_compatibility_version" : "6.0.0-beta1"
+  },
+  "tagline" : "You Know, for Search"
+}
+
+--->Let’s create a new config file
+
+sudo vim /etc/logstash/conf.d/apache.conf
+
+---> configurations
+
+input { 
+  kafka { 
+    bootstrap_servers => "localhost:9092" 
+    topics => "apache" 
+    } 
+}
+ 
+filter {
+    grok {
+      match => { "message" => "%{COMBINEDAPACHELOG}" }
+    }
+    date {
+    match => [ "timestamp" , "dd/MMM/yyyy:HH:mm:ss Z" ]
+    }
+  geoip {
+      source => "clientip"
+    }
+}
+
+
+
+server.port: 5601
+elasticsearch.url: "http://localhost:9200"
+
+ 
+
+--->Starting the data pipeline
+
+
+--->start Kibana
+sudo service logstash start
+
+/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server 
+localhost:9092 --topic apache --from-beginning
+
+
+2019-04-23T13:50:01.559Z 89.138.90.236 - - [23/Apr/2019:13:50:00 +0000] 
+"GET /mysite.html HTTP/1.1" 200 426 "-" "Mozilla/5.0 
+(Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) 
+Chrome/73.0.3683.86 Safari/537.36"
+2019-04-23T13:51:36.581Z 89.138.90.236 - - 
+[23/Apr/2019:13:51:34 +0000] "GET /mysite.html HTTP/1.1" 200 427 "-" 
+"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 
+(KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36"
+
+
+
+curl -X GET "localhost:9200/_cat/indices?v"
+
+
+health status index                      uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   .kibana_task_manager       zmMH6yy8Q6yg2jJHxq3MFA   1   0          2            0     45.4kb         45.4kb
+yellow open   logstash-2019.04.23-000001 rBx5r_gIS3W2dTxHzGJVvQ   1   1          9            0     69.4kb         69.4kb
+green  open   .kibana_1                  rv5f8uHnQTCGe8YrcKAwlQ   1   0    
+
+
+
+
+
+
+
+
+
+
+
