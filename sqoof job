@@ -1,0 +1,30 @@
+--->sqoof import and export will onely happen to hdfs
+
+---> if we are communicating from hadoop through RDBMS using sqoof component the targect RDBMS must be of java compatiable RDBMS
+ 
+---> when using single node or multi node haddop cluster we can run sqoof jobs it workes onely make use of mapper phage alone. 
+ ---> import data through HDFS .reducer phase is not used 
+ 
+ ------>connection details.txt
+             --connect
+             --user name
+                 root
+               --password
+               root
+               
+ --->sqoof job -- create sqoofjob111 --import --options-file connectionDetails.txt--table empdata-m1--target-dir/import-dir22
+ 
+---> sqoof jod--exec sqoofjob111
+
+  
+ crontab -e
+ export EDITOR=vim
+ sudo crontab -u www-data -e
+ 
+ @hourly /opt/bin/sqoofjob111 >/dev/null
+ 
+ @hourly /opt/bin/sqoofjob111 >/dev/null 2>&1
+ 
+ 1 0 \* \* \* /opt/bin/cal-update-daily
+ 
+ 45 16 1,15 \* \* /opt/bin/payroll-bi-monthly
