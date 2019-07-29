@@ -1,0 +1,8 @@
+1.	Code that results average throughput, for each ‘Co Server’ and ASN. What is the formula for Throughput used by you in the code?
+
+2.	Written explanation of how to approach creating average throughput for ‘Co Server’, ASN. Please submit the resulting aggregated data set.
+
+
+3.	What could be an additional grouping field that could be chosen in future. Describe how far you can go in grouping data by various keys. List as many keys as you can.
+
+TH = I / T
